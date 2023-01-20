@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction &mdash; The Swiss case: Reactions of the real economy to the discontinuation of the exchange rate floor in 2015. A synthetic control approach  documentation</title>
+    
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="The Swiss case: Reactions of the real economy to the discontinuation of the exchange rate floor in 2015. A synthetic control approach  documentation" href="index.html" />
+    <link rel="next" title="Original data" href="original_data.html" />
+    <link rel="prev" title="Welcome to the project’s documentation of: “The Swiss case: Reactions of the real economy to the discontinuation of the exchange rate floor in 2015. A synthetic control approach”!" href="index.html" /> 
+  </head>
+  <body role="document">
+      <div class="header" role="banner"><h1 class="heading"><a href="index.html">
+          <span>The Swiss case: Reactions of the real economy to the discontinuation of the exchange rate floor in 2015. A synthetic control approach  documentation</span></a></h1>
+        <h2 class="heading"><span>Introduction</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="index.html">Welcome to the project&#8217;s documentation of: &#8220;The Swiss case: Reactions of the real economy to the discontinuation of the exchange rate floor in 2015. A synthetic control approach&#8221;!</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="original_data.html">Original data</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="introduction">
+<span id="id1"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>This project estimates the real consequences of the Swiss appreciation from January 2015 using the synthetic control method. The idea is to construct a synthetic Switzerland
+as a control unit, which describes how Switzerland would have developed in absence of a large appreciation. The difference in development after the decision of the SNB to unpeg the franc
+between the actual and the synthetic Switzerland is the treatment effect.</p>
+<p>The method is based on Abadie et al. (2010, 2014). <a class="reference internal" href="references.html#abadie2010" id="id2">[1]</a> <a class="reference internal" href="references.html#abadie2014" id="id3">[2]</a>
+On the basis of pre-treatment data a weighted average of control countries is constructed to work as a synthetic control for the treated country.
+The method is described shortly below.</p>
+<p>The algorithm used to calculate the synthetic control is based on Becker and Klößner (2018) <a class="reference internal" href="references.html#becker2018" id="id4">[3]</a>.
+The implementation and algorithm suggested by them is explained briefly below.</p>
+<p>The project is based on the Templates for Reproducible Research Projects in Economics by von Gaudecker. <a class="reference internal" href="references.html#gaudeckereconprojecttemplates" id="id5">[4]</a></p>
+<div class="section" id="structure">
+<h2>Structure<a class="headerlink" href="#structure" title="Permalink to this headline">¶</a></h2>
+<p>The project is structured in different folders. Every folder contains files with dictinct functions.
+The folders are:</p>
+<blockquote>
+<div><ul class="simple">
+<li>original_data</li>
+<li>data_management</li>
+<li>analysis</li>
+<li>final</li>
+<li>paper</li>
+<li>model_code</li>
+<li>model_specs</li>
+</ul>
+<p>Following the folders, the project is organised in different steps:</p>
+<ol class="arabic simple">
+<li>data management: take the raw data from <strong>original_data</strong> and clean it and bring it in the structure we need (second normal form)</li>
+<li>analysis: Taking the functions defining the &#8220;model&#8221;, in my case implementing the algorithm of Becker and Klößner (2018) <a class="reference internal" href="references.html#becker2018" id="id6">[3]</a> from <strong>model_code</strong>, and the specifications defined for the models in <strong>model_specs</strong>, the main analysis is done. The synthetic control unit and all necessary values are calculated and the results are stored.</li>
+<li>final: In this step the results from the analysis step are visualised. This means tables and figures are constructed.</li>
+<li>paper: This is the last step. Figures and tables are incorporated and the paper is compiled.</li>
+</ol>
+</div></blockquote>
+<p>Detailed discribtions of what exactly every step and file is doing can be found in the following chapters.</p>
+<p>The project runs 6 different specifications contained in <strong>model_specs</strong>. These are:</p>
+<ol class="arabic simple">
+<li>a baseline specification for GDPPC: outcome is GDPPC and predictors are yearly averages of the outcome for 2008, 2010, 2012, 2013, 2014</li>
+<li>a all-year averages specification for GDPPC: outcome is GDPPC and predictors are yearly averages of the outcome for 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014</li>
+<li>a with-covariates specification: outcome is GDPPC and predictors are an averages of the outcome for 2012, 2013, 2014 and other covariates: trade opennes, inflation, industry share and schooling</li>
+<li>a current-account specification: outcome is CA as % of GDP and predictors are an averages of the outcome for 2012, 2013, 2014 and other covariates: trade opennes, inflation, industry share and schooling</li>
+<li>a time placebo specification: as baseline, but treatment time changes to 2005Q1 and accordingly sample period and predictor years are ten years earlier</li>
+<li>a country-placebo specification: as baseline, but treated country changes to Australia and Switzerland is excluded</li>
+</ol>
+<p>For every specification the analysis is run and tables and figures are produced.</p>
+</div>
+<div class="section" id="the-synthetic-control-method">
+<h2>The Synthetic Control Method<a class="headerlink" href="#the-synthetic-control-method" title="Permalink to this headline">¶</a></h2>
+<p>In this section I want to give a short description of the synthetic control method. It follows mainly Abadie (2010) <a class="reference internal" href="references.html#abadie2010" id="id7">[1]</a> . For details please refer to this paper and the ones cited above.</p>
+<p>The synthetic control method is a data-driven approach to construct a suitable control unit in comparative case studies. The idea is that a combination of control units will often provide a better comparison for the treated unit than a single control unit alone. Therefore, the synthetic control is constructed as a weighted average of so called donors, a sample of suitable control units, with non-negative weights that sum to one. These weights, collected in a vector <em>W</em>, are calculated by minimizing the difference of selected predictor variables between the treated unit and the synthetic control. The predictor variables can be linear combinations of the outcome variable prior to treatment as well as other covariates with explanatory power for the outcome of interest, which need to be measured prior to or unaffected by the treatment. In the optimization the predictors are weighted by a predictor weighting matrix <em>V</em>, which is chosen to result in optimal weights <em>W</em> that yield the lowest possible RMSPE between the outcome of the treated unit and the synthetic control prior to treatment. This structure leads to a nested optimization problem. In the inner optimization the optimal donor weights <em>W</em> are determined, which construct the synthetic control unit. These optimization depends on the predictor weights <em>V</em>, which are determined in the outer optimization to guarantee the best possible pre-treatment fit. The resulting optimal weights define the synthetic control unit. The treatment effect consists of the difference in the outcome variable after treatment between the treated unit and the synthetic control.</p>
+</div>
+<div class="section" id="the-implementation-and-the-algorithm">
+<h2>The Implementation and  the Algorithm<a class="headerlink" href="#the-implementation-and-the-algorithm" title="Permalink to this headline">¶</a></h2>
+<p>The structure of the synthetic control method described above poses some challenges to the implementation. The problem is that the nested optimization is not only computational intensive and therefore slow with larger data sets, but it might also be quite unstable and unreliable with numerical optimizers. The reason for that is that the objective function of the outer optimization contains a minimization problem, which results in a noisy function that might be ill behaved and can fool the outer optimizer. Becker and Klößner (2018) <a class="reference internal" href="references.html#becker2018" id="id8">[3]</a> provide an algorithm that tries to reduce these problems. It starts with detecting important special cases that are easy to compute and then tries to reduce the dimension of the nested optimization problem.</p>
+<p>The basis of Becker and Klößner&#8217;s argumentation consists of some theory concerning the optimization problems that have to be solved for applying the synthetic control method. They start with separating the donor pool in sunny and shady donors. A shady donor is a control unit, whose difference in predictor values to the treated unit multiplied by <span class="math">\(\alpha\)</span> with <span class="math">\(0&lt;\alpha&lt;1\)</span> lies inside the convex hull of the differences of all donor units. They show that if a donor is shady, it will not be part of an optimal synthetic control unit. Furthermore, they give simple solutions in cases with no sunny donors, which means exact fit is possible, or only one sunny donor, which will then be the unique donor with positive weight. If none of these special cases occur, the algorithm tests whether the unrestricted outer optimum is feasible. This means it searches for predictor weights <em>V</em> which result in donor weights <em>W</em> that constitute the global minimum of the outer optimization problem. Only if finding such predictor weights is not possible, the nested optimization is performed. In order to do this, the dimension of the problem is reduced by excluding all shady donors. A detailed description of the algorithm can be found in Becker and Klößner (2018) <a class="reference internal" href="references.html#becker2018" id="id9">[3]</a> and Figure 2 in their paper illustrate it&#8217;s structure in a simple way.</p>
+</div>
+<div class="section" id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<p>I do different forms of testing:</p>
+<p>For the functions defined in the model code that construct the algorithm explained in the last section I do unit and integration tests using pytest. For the function
+putting everything together I do system tests.
+These tests confirm that I implemented all formulas from Becker and Klößner correctly.</p>
+<p>All data work was firstly done and tested using Jupyter notebooks.</p>
+<p>Furtherore, as a kind of regression testing, I compared some results to the implementation of the synthetic control method in stata (the synth package by Abadie et al. (2010) <a class="reference internal" href="references.html#abadie2010" id="id10">[1]</a>)
+for one specification and the results are similar.</p>
+</div>
+</div>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="index.html">Welcome to the project&#8217;s documentation of: &#8220;The Swiss case: Reactions of the real economy to the discontinuation of the exchange rate floor in 2015. A synthetic control approach&#8221;!</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="original_data.html">Original data</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2013-, Martin Dohmen.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>

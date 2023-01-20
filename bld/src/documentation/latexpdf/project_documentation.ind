@@ -1,0 +1,92 @@
+\begin{theindex}
+
+  \item calculate\_inner\_part\_of\_inequ\_constr\_for\_linprog\_16() (in module src.model\_code.synth\_control\_functions), 
+		\hyperpage{15}
+  \item create\_ca\_percentage\_gdp\_table() (in module src.data\_management.clean\_raw\_data), 
+		\hyperpage{7}
+  \item create\_country\_table() (in module src.data\_management.clean\_raw\_data), 
+		\hyperpage{7}
+  \item create\_gdppc\_const\_prices\_table() (in module src.data\_management.clean\_raw\_data), 
+		\hyperpage{7}
+  \item create\_gdppc\_current\_prices\_table() (in module src.data\_management.clean\_raw\_data), 
+		\hyperpage{7}
+  \item create\_matrix\_v\_from\_v\_k\_tilde() (in module src.model\_code.synth\_control\_functions), 
+		\hyperpage{15}
+  \item create\_period\_table() (in module src.data\_management.clean\_raw\_data), 
+		\hyperpage{7}
+  \item create\_table\_of\_predictors() (in module src.data\_management.clean\_raw\_data), 
+		\hyperpage{7}
+
+  \indexspace
+
+  \item determine\_synthetic\_control\_weights() (in module src.model\_code.synth\_control\_functions), 
+		\hyperpage{15}
+  \item determine\_unrestricted\_outer\_optimum() (in module src.model\_code.synth\_control\_functions), 
+		\hyperpage{15}
+
+  \indexspace
+
+  \item find\_sunny\_donors() (in module src.model\_code.synth\_control\_functions), 
+		\hyperpage{15}
+  \item function\_to\_solve\_for\_outer\_optimum() (in module src.model\_code.synth\_control\_functions), 
+		\hyperpage{16}
+
+  \indexspace
+
+  \item get\_dates\_for\_x\_axsis() (in module src.final.plot\_sc\_graph), 
+		\hyperpage{11}
+  \item get\_x\_one\_and\_x\_zero\_from\_data() (in module src.analysis.synthetic\_control), 
+		\hyperpage{9}
+  \item get\_x\_tilde() (in module src.analysis.synthetic\_control), 
+		\hyperpage{9}
+  \item get\_z\_one\_from\_data() (in module src.analysis.synthetic\_control), 
+		\hyperpage{9}
+  \item get\_z\_tilde() (in module src.analysis.synthetic\_control), 
+		\hyperpage{9}
+  \item get\_z\_zero\_from\_data() (in module src.analysis.synthetic\_control), 
+		\hyperpage{9}
+
+  \indexspace
+
+  \item inner\_optimization() (in module src.model\_code.synth\_control\_functions), 
+		\hyperpage{16}
+  \item inner\_optimization\_function() (in module src.model\_code.synth\_control\_functions), 
+		\hyperpage{16}
+
+  \indexspace
+
+  \item outer\_optimization() (in module src.model\_code.synth\_control\_functions), 
+		\hyperpage{16}
+  \item outer\_optimization\_function() (in module src.model\_code.synth\_control\_functions), 
+		\hyperpage{16}
+
+  \indexspace
+
+  \item plot\_dep\_var() (in module src.final.plot\_sc\_graph), 
+		\hyperpage{11}
+
+  \indexspace
+
+  \item read\_in\_data() (in module src.data\_management.clean\_raw\_data), 
+		\hyperpage{7}
+
+  \indexspace
+
+  \item solve\_case\_of\_no\_sunny\_donors() (in module src.model\_code.synth\_control\_functions), 
+		\hyperpage{16}
+  \item src.analysis.synthetic\_control (module), \hyperpage{9}
+  \item src.data\_management.clean\_raw\_data (module), \hyperpage{7}
+  \item src.final.plot\_sc\_graph (module), \hyperpage{11}
+  \item src.model\_code.synth\_control\_functions (module), 
+		\hyperpage{15}
+  \item standarize\_data() (in module src.analysis.synthetic\_control), 
+		\hyperpage{9}
+
+  \indexspace
+
+  \item ten\_to\_the\_power\_of\_x() (in module src.model\_code.synth\_control\_functions), 
+		\hyperpage{16}
+  \item try\_if\_unrestricted\_outer\_optimum\_feasible() (in module src.model\_code.synth\_control\_functions), 
+		\hyperpage{16}
+
+\end{theindex}

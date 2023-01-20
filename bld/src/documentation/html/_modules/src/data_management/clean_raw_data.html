@@ -1,0 +1,326 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>src.data_management.clean_raw_data &mdash; The Swiss case: Reactions of the real economy to the discontinuation of the exchange rate floor in 2015. A synthetic control approach  documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="The Swiss case: Reactions of the real economy to the discontinuation of the exchange rate floor in 2015. A synthetic control approach  documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body role="document">
+      <div class="header" role="banner"><h1 class="heading"><a href="../../../index.html">
+          <span>The Swiss case: Reactions of the real economy to the discontinuation of the exchange rate floor in 2015. A synthetic control approach  documentation</span></a></h1>
+        <h2 class="heading"><span>src.data_management.clean_raw_data</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <h1>Source code for src.data_management.clean_raw_data</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Clean the raw data to use it for the analysis and bring it in the second normal</span>
+<span class="sd">form: Create a table for countries with IDs, one for time periods with IDs and</span>
+<span class="sd">one for every data series we do have and use later on. Furthermore, clean and</span>
+<span class="sd">replace missings for predictors and calculate averages for predictors over the </span>
+<span class="sd">years 2012-2014 and safe them in a seperate datafile.</span>
+
+<span class="sd">All tested using Jupyter notebook and regression tests.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">bld.project_paths</span> <span class="kn">import</span> <span class="n">project_paths_join</span> <span class="k">as</span> <span class="n">ppj</span>
+
+
+<div class="viewcode-block" id="read_in_data"><a class="viewcode-back" href="../../../data_management.html#src.data_management.clean_raw_data.read_in_data">[docs]</a><span class="k">def</span> <span class="nf">read_in_data</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read in source data.&quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+            <span class="n">ppj</span><span class="p">(</span><span class="s1">&#39;IN_DATA&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="create_country_table"><a class="viewcode-back" href="../../../data_management.html#src.data_management.clean_raw_data.create_country_table">[docs]</a><span class="k">def</span> <span class="nf">create_country_table</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create table of countries sorted alphabetically with new IDs.&quot;&quot;&quot;</span>
+
+    <span class="n">countries</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s1">&#39;Country&#39;</span><span class="p">]]</span>
+    <span class="n">countries</span> <span class="o">=</span> <span class="n">countries</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
+    <span class="n">countries</span> <span class="o">=</span> <span class="n">countries</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;Country&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">countries</span><span class="p">[</span><span class="s1">&#39;country_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">countries</span><span class="o">.</span><span class="n">index</span>
+    <span class="n">countries</span> <span class="o">=</span> <span class="n">countries</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;country_id&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">countries</span>
+
+</div>
+<div class="viewcode-block" id="create_period_table"><a class="viewcode-back" href="../../../data_management.html#src.data_management.clean_raw_data.create_period_table">[docs]</a><span class="k">def</span> <span class="nf">create_period_table</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create table of Periods with IDs.&quot;&quot;&quot;</span>
+
+    <span class="n">periods</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s1">&#39;Period&#39;</span><span class="p">]]</span>
+    <span class="n">periods</span> <span class="o">=</span> <span class="n">periods</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
+    <span class="n">periods</span> <span class="o">=</span> <span class="n">periods</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">periods</span><span class="p">[</span><span class="s1">&#39;period_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">periods</span><span class="o">.</span><span class="n">index</span>
+    <span class="n">periods</span> <span class="o">=</span> <span class="n">periods</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;period_id&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">periods</span>
+
+</div>
+<div class="viewcode-block" id="create_gdppc_const_prices_table"><a class="viewcode-back" href="../../../data_management.html#src.data_management.clean_raw_data.create_gdppc_const_prices_table">[docs]</a><span class="k">def</span> <span class="nf">create_gdppc_const_prices_table</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">countries</span><span class="p">,</span> <span class="n">periods</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create table of GDPPC in constant prices (OECD reference year)</span>
+<span class="sd">    with fixed PPP for every country only including</span>
+<span class="sd">    country ID and period ID.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Extract necessary columns.</span>
+    <span class="n">gdppc_const_prices</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;MEASURE&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;HVPVOBARSA&#39;</span><span class="p">]</span>
+    <span class="n">gdppc_const_prices</span> <span class="o">=</span> <span class="n">gdppc_const_prices</span><span class="p">[[</span><span class="s1">&#39;Country&#39;</span><span class="p">,</span> <span class="s1">&#39;Value&#39;</span><span class="p">,</span> <span class="s1">&#39;Period&#39;</span><span class="p">]]</span>
+
+    <span class="c1"># Add country IDs and delete columns we do not need.</span>
+    <span class="n">gdppc_const_prices</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">countries</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span>
+                                  <span class="n">gdppc_const_prices</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span>
+                                  <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Country&#39;</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span>
+                                          <span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="s1">&#39;Country&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Add period IDs, delete columns we do not need and reset Index to IDs.</span>
+    <span class="n">gdppc_const_prices</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">periods</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span>
+                                  <span class="n">gdppc_const_prices</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span>
+                                  <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Period&#39;</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span>
+                                          <span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span>
+                                                  <span class="p">[</span><span class="s1">&#39;country_id&#39;</span><span class="p">,</span> <span class="s1">&#39;period_id&#39;</span><span class="p">])</span>
+    <span class="n">gdppc_const_prices</span> <span class="o">=</span> <span class="n">gdppc_const_prices</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="s1">&#39;Period&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gdppc_const_prices</span>
+
+</div>
+<div class="viewcode-block" id="create_gdppc_current_prices_table"><a class="viewcode-back" href="../../../data_management.html#src.data_management.clean_raw_data.create_gdppc_current_prices_table">[docs]</a><span class="k">def</span> <span class="nf">create_gdppc_current_prices_table</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">countries</span><span class="p">,</span> <span class="n">periods</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create table of GDPPC in current prices with current PPP for every country</span>
+<span class="sd">    only including country ID and period ID.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Extract necessary columns.</span>
+    <span class="n">gdppc_current_prices</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;MEASURE&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;HCPCARSA&#39;</span><span class="p">]</span>
+    <span class="n">gdppc_current_prices</span> <span class="o">=</span> <span class="n">gdppc_current_prices</span><span class="p">[[</span><span class="s1">&#39;Country&#39;</span><span class="p">,</span> <span class="s1">&#39;Value&#39;</span><span class="p">,</span> <span class="s1">&#39;Period&#39;</span><span class="p">]]</span>
+
+    <span class="c1"># Add country IDs and delete columns we do not need.</span>
+    <span class="n">gdppc_current_prices</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">countries</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span>
+                                    <span class="n">gdppc_current_prices</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span>
+                                    <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Country&#39;</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span>
+                                          <span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="s1">&#39;Country&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Add period IDs, delete columns we do not need and reset Index to IDs.</span>
+    <span class="n">gdppc_current_prices</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">periods</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span>
+                                    <span class="n">gdppc_current_prices</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span>
+                                    <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Period&#39;</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span>
+                                          <span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span>
+                                                  <span class="p">[</span><span class="s1">&#39;country_id&#39;</span><span class="p">,</span> <span class="s1">&#39;period_id&#39;</span><span class="p">])</span>
+    <span class="n">gdppc_current_prices</span> <span class="o">=</span> <span class="n">gdppc_current_prices</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="s1">&#39;Period&#39;</span><span class="p">],</span>
+                                                     <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gdppc_current_prices</span>
+
+</div>
+<div class="viewcode-block" id="create_ca_percentage_gdp_table"><a class="viewcode-back" href="../../../data_management.html#src.data_management.clean_raw_data.create_ca_percentage_gdp_table">[docs]</a><span class="k">def</span> <span class="nf">create_ca_percentage_gdp_table</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">countries</span><span class="p">,</span> <span class="n">periods</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create table of current accout in percentage of GDP for every country</span>
+<span class="sd">    only including country ID and period ID.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Extract necessary columns.</span>
+    <span class="n">ca_percentage_gdp</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s1">&#39;Country&#39;</span><span class="p">,</span> <span class="s1">&#39;Time&#39;</span><span class="p">,</span> <span class="s1">&#39;Value&#39;</span><span class="p">]]</span>
+
+    <span class="c1"># Rename column for merge.</span>
+    <span class="n">ca_percentage_gdp</span> <span class="o">=</span> <span class="n">ca_percentage_gdp</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Time&#39;</span><span class="p">:</span> <span class="s1">&#39;Period&#39;</span><span class="p">})</span>
+
+    <span class="c1"># Merge with countries and periods, droping unnecessary columns.</span>
+    <span class="n">ca_percentage_gdp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">countries</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span>
+                                 <span class="n">ca_percentage_gdp</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span>
+                                 <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Country&#39;</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span>
+                                 <span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="s1">&#39;Country&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">ca_percentage_gdp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">periods</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span>
+                                 <span class="n">ca_percentage_gdp</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span>
+                                 <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Period&#39;</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span>
+                                 <span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span>
+                                 <span class="p">[</span><span class="s1">&#39;country_id&#39;</span><span class="p">,</span> <span class="s1">&#39;period_id&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span>
+                                 <span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="s1">&#39;Period&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ca_percentage_gdp</span>
+
+</div>
+<div class="viewcode-block" id="create_table_of_predictors"><a class="viewcode-back" href="../../../data_management.html#src.data_management.clean_raw_data.create_table_of_predictors">[docs]</a><span class="k">def</span> <span class="nf">create_table_of_predictors</span><span class="p">(</span><span class="n">country_table</span><span class="p">,</span> <span class="n">predictor_variables</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Create the table of predictor variables for every country only including</span>
+<span class="sd">    country id and the different predictors.&quot;&quot;&quot;</span>
+
+    <span class="n">predictors</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">country_table</span><span class="p">)</span>
+
+    <span class="c1"># Append data for trade openness.</span>
+    <span class="n">trade_openness</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">predictor_variables</span><span class="p">[</span><span class="n">predictor_variables</span><span class="p">[</span><span class="s1">&#39;Series Name&#39;</span><span class="p">]</span> <span class="o">==</span>
+                                <span class="s1">&#39;Trade (</span><span class="si">% o</span><span class="s1">f GDP)&#39;</span><span class="p">])</span>
+    <span class="n">trade_openness</span><span class="p">[</span><span class="s1">&#39;average&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">trade_openness</span><span class="p">[</span><span class="s1">&#39;2012 [YR2012]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span> <span class="o">+</span>
+        <span class="n">trade_openness</span><span class="p">[</span><span class="s1">&#39;2013 [YR2013]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span> <span class="o">+</span>
+        <span class="n">trade_openness</span><span class="p">[</span><span class="s1">&#39;2014 [YR2014]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">))</span><span class="o">/</span><span class="mi">3</span>
+    <span class="n">trade_openness</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">trade_openness</span><span class="p">[[</span><span class="s1">&#39;</span><span class="se">\ufeff</span><span class="s1">Country Name&#39;</span><span class="p">,</span>
+                                                 <span class="s1">&#39;average&#39;</span><span class="p">]])</span>
+    <span class="n">trade_openness</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;</span><span class="se">\ufeff</span><span class="s1">Country Name&#39;</span><span class="p">:</span> <span class="s1">&#39;Country&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;average&#39;</span><span class="p">:</span> <span class="s1">&#39;trade_openness&#39;</span><span class="p">},</span>
+            <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">predictors</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">predictors</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span>
+                          <span class="n">trade_openness</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span>
+                          <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Country&#39;</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;country_id&#39;</span><span class="p">)</span>
+    <span class="n">predictors</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;index&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="c1"># Append data for industry share.</span>
+    <span class="n">industry_share</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">predictor_variables</span><span class="p">[</span><span class="n">predictor_variables</span><span class="p">[</span><span class="s1">&#39;Series Name&#39;</span><span class="p">]</span> <span class="o">==</span>
+                                <span class="s1">&#39;Industry, value added (</span><span class="si">% o</span><span class="s1">f GDP)&#39;</span><span class="p">])</span>
+    <span class="c1"># Create missing value for canada 2014 as Canada 2013.</span>
+    <span class="n">industry_share</span><span class="p">[</span><span class="s1">&#39;2014 [YR2014]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">19</span><span class="p">]</span> <span class="o">=</span> \
+        <span class="n">industry_share</span><span class="p">[</span><span class="s1">&#39;2013 [YR2013]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">19</span><span class="p">]</span>
+    <span class="n">industry_share</span><span class="p">[</span><span class="s1">&#39;average&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">industry_share</span><span class="p">[</span><span class="s1">&#39;2012 [YR2012]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span> <span class="o">+</span>
+        <span class="n">industry_share</span><span class="p">[</span><span class="s1">&#39;2013 [YR2013]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span> <span class="o">+</span>
+        <span class="n">industry_share</span><span class="p">[</span><span class="s1">&#39;2014 [YR2014]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">))</span><span class="o">/</span><span class="mi">3</span>
+    <span class="n">industry_share</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="n">industry_share</span><span class="p">[[</span><span class="s1">&#39;</span><span class="se">\ufeff</span><span class="s1">Country Name&#39;</span><span class="p">,</span> <span class="s1">&#39;average&#39;</span><span class="p">]])</span>
+    <span class="n">industry_share</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;</span><span class="se">\ufeff</span><span class="s1">Country Name&#39;</span><span class="p">:</span> <span class="s1">&#39;Country&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;average&#39;</span><span class="p">:</span> <span class="s1">&#39;industry_share&#39;</span><span class="p">},</span>
+            <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">predictors</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">predictors</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span>
+                          <span class="n">industry_share</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span>
+                          <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Country&#39;</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span>
+                          <span class="s1">&#39;country_id&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;index&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Append data for inflation rate.</span>
+    <span class="n">inflation_rate</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">predictor_variables</span><span class="p">[</span><span class="n">predictor_variables</span><span class="p">[</span><span class="s1">&#39;Series Name&#39;</span><span class="p">]</span> <span class="o">==</span>
+                                <span class="s1">&#39;Inflation, consumer prices (annual %)&#39;</span><span class="p">])</span>
+    <span class="n">inflation_rate</span><span class="p">[</span><span class="s1">&#39;average&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">inflation_rate</span><span class="p">[</span><span class="s1">&#39;2012 [YR2012]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+                                 <span class="o">+</span> <span class="n">inflation_rate</span><span class="p">[</span><span class="s1">&#39;2013 [YR2013]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+                                 <span class="o">+</span> <span class="n">inflation_rate</span><span class="p">[</span><span class="s1">&#39;2014 [YR2014]&#39;</span><span class="p">]</span><span class="o">.</span>
+                                 <span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">))</span><span class="o">/</span><span class="mi">3</span>
+    <span class="n">inflation_rate</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">inflation_rate</span><span class="p">[[</span><span class="s1">&#39;</span><span class="se">\ufeff</span><span class="s1">Country Name&#39;</span><span class="p">,</span>
+                                  <span class="s1">&#39;average&#39;</span><span class="p">]])</span>
+    <span class="n">inflation_rate</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;</span><span class="se">\ufeff</span><span class="s1">Country Name&#39;</span><span class="p">:</span> <span class="s1">&#39;Country&#39;</span><span class="p">,</span> <span class="s1">&#39;average&#39;</span><span class="p">:</span>
+                     <span class="s1">&#39;inflation_rate&#39;</span><span class="p">},</span>
+            <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">predictors</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">predictors</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span>
+                          <span class="n">inflation_rate</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span>
+                          <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Country&#39;</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span>
+                          <span class="s1">&#39;country_id&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;index&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Append data for schooling.</span>
+    <span class="n">schooling</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">predictor_variables</span><span class="p">[</span><span class="n">predictor_variables</span><span class="p">[</span><span class="s1">&#39;Series Name&#39;</span><span class="p">]</span> <span class="o">==</span>
+                                <span class="s1">&#39;Educational attainment, at least completed upper secondary, population 25+, total (%) (cumulative)&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Create missing from older or newer values for: Canada, Chile, Greece,</span>
+    <span class="c1"># Ireland, Iceland, Japan, Italy, Korea, New Zealand, Norway, Spain,</span>
+    <span class="c1"># Switzerland</span>
+    <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2012 [YR2012]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">22</span><span class="p">]</span> <span class="o">=</span> <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2011 [YR2011]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">22</span><span class="p">]</span>
+    <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2013 [YR2013]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">22</span><span class="p">]</span> <span class="o">=</span> <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2011 [YR2011]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">22</span><span class="p">]</span>
+    <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2014 [YR2014]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">22</span><span class="p">]</span> <span class="o">=</span> <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2011 [YR2011]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">22</span><span class="p">]</span>
+    <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2012 [YR2012]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">28</span><span class="p">]</span> <span class="o">=</span> <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2013 [YR2013]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">28</span><span class="p">]</span>
+    <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2014 [YR2014]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">28</span><span class="p">]</span> <span class="o">=</span> <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2013 [YR2013]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">28</span><span class="p">]</span>
+    <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2012 [YR2012]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">70</span><span class="p">]</span> <span class="o">=</span> <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2014 [YR2014]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">70</span><span class="p">]</span>
+    <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2013 [YR2013]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">70</span><span class="p">]</span> <span class="o">=</span> <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2014 [YR2014]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">70</span><span class="p">]</span>
+    <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2012 [YR2012]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">82</span><span class="p">]</span> <span class="o">=</span> <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2011 [YR2011]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">82</span><span class="p">]</span>
+    <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2013 [YR2013]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">82</span><span class="p">]</span> <span class="o">=</span> <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2011 [YR2011]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">82</span><span class="p">]</span>
+    <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2014 [YR2014]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">82</span><span class="p">]</span> <span class="o">=</span> <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2011 [YR2011]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">82</span><span class="p">]</span>
+    <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2012 [YR2012]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">88</span><span class="p">]</span> <span class="o">=</span> <span class="mf">60.7</span>  <span class="c1"># Iceland, value from 2005</span>
+    <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2013 [YR2013]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">88</span><span class="p">]</span> <span class="o">=</span> <span class="mf">60.7</span>
+    <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2014 [YR2014]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">88</span><span class="p">]</span> <span class="o">=</span> <span class="mf">60.7</span>
+    <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2012 [YR2012]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">94</span><span class="p">]</span> <span class="o">=</span> <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2010 [YR2010]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">94</span><span class="p">]</span>
+    <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2013 [YR2013]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">94</span><span class="p">]</span> <span class="o">=</span> <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2010 [YR2010]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">94</span><span class="p">]</span>
+    <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2014 [YR2014]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">94</span><span class="p">]</span> <span class="o">=</span> <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2010 [YR2010]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">94</span><span class="p">]</span>
+    <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2013 [YR2013]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">100</span><span class="p">]</span> <span class="o">=</span> <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2014 [YR2014]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">100</span><span class="p">]</span>
+    <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2012 [YR2012]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">112</span><span class="p">]</span> <span class="o">=</span> <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2010 [YR2010]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">112</span><span class="p">]</span>
+    <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2013 [YR2013]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">112</span><span class="p">]</span> <span class="o">=</span> <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2010 [YR2010]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">112</span><span class="p">]</span>
+    <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2014 [YR2014]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">112</span><span class="p">]</span> <span class="o">=</span> <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2010 [YR2010]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">112</span><span class="p">]</span>
+    <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2013 [YR2013]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">142</span><span class="p">]</span> <span class="o">=</span> <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2014 [YR2014]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">142</span><span class="p">]</span>
+    <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2012 [YR2012]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">148</span><span class="p">]</span> <span class="o">=</span> <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2014 [YR2014]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">148</span><span class="p">]</span>
+    <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2013 [YR2013]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">148</span><span class="p">]</span> <span class="o">=</span> <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2014 [YR2014]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">148</span><span class="p">]</span>
+    <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2013 [YR2013]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">178</span><span class="p">]</span> <span class="o">=</span> <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2014 [YR2014]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">178</span><span class="p">]</span>
+    <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2013 [YR2013]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">190</span><span class="p">]</span> <span class="o">=</span> <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2014 [YR2014]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">190</span><span class="p">]</span>
+
+    <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;average&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2012 [YR2012]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span> <span class="o">+</span>
+                            <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2013 [YR2013]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span> <span class="o">+</span>
+                            <span class="n">schooling</span><span class="p">[</span><span class="s1">&#39;2014 [YR2014]&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">))</span><span class="o">/</span><span class="mi">3</span>
+    <span class="n">schooling</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">schooling</span><span class="p">[[</span><span class="s1">&#39;</span><span class="se">\ufeff</span><span class="s1">Country Name&#39;</span><span class="p">,</span> <span class="s1">&#39;average&#39;</span><span class="p">]])</span>
+    <span class="n">schooling</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;</span><span class="se">\ufeff</span><span class="s1">Country Name&#39;</span><span class="p">:</span> <span class="s1">&#39;Country&#39;</span><span class="p">,</span> <span class="s1">&#39;average&#39;</span><span class="p">:</span> <span class="s1">&#39;schooling&#39;</span><span class="p">},</span>
+            <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">predictors</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">predictors</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span> <span class="n">schooling</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span>
+                          <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Country&#39;</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span>
+                          <span class="s1">&#39;country_id&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;index&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">predictors</span>
+
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="c1"># Read in and create data tables for countries with ID and Periods with ID.</span>
+    <span class="n">gdppc_data</span> <span class="o">=</span> <span class="n">read_in_data</span><span class="p">(</span><span class="s1">&#39;GDPPC_OECD_1990_2017.csv&#39;</span><span class="p">)</span>
+    <span class="n">countries</span> <span class="o">=</span> <span class="n">create_country_table</span><span class="p">(</span><span class="n">gdppc_data</span><span class="p">)</span>
+    <span class="n">periods</span> <span class="o">=</span> <span class="n">create_period_table</span><span class="p">(</span><span class="n">gdppc_data</span><span class="p">)</span>
+
+    <span class="c1"># Create data tables for GDPPC including only values, country and period</span>
+    <span class="c1"># IDs.</span>
+    <span class="n">gdppc_const_price</span> <span class="o">=</span> <span class="n">create_gdppc_const_prices_table</span><span class="p">(</span>
+            <span class="n">gdppc_data</span><span class="p">,</span> <span class="n">countries</span><span class="p">,</span> <span class="n">periods</span><span class="p">)</span>
+    <span class="n">gdppc_current_price</span> <span class="o">=</span> <span class="n">create_gdppc_current_prices_table</span><span class="p">(</span>
+            <span class="n">gdppc_data</span><span class="p">,</span> <span class="n">countries</span><span class="p">,</span> <span class="n">periods</span><span class="p">)</span>
+
+    <span class="c1"># Read in data for CA and create data tables for CA only including values,</span>
+    <span class="c1"># country ID and period ID</span>
+    <span class="n">ca_data</span> <span class="o">=</span> <span class="n">read_in_data</span><span class="p">(</span>
+            <span class="s1">&#39;Current_account_percentage_GDP_OECD_quarterly_1990_2017.csv&#39;</span><span class="p">)</span>
+    <span class="n">ca_percent_gdp</span> <span class="o">=</span> <span class="n">create_ca_percentage_gdp_table</span><span class="p">(</span>
+            <span class="n">ca_data</span><span class="p">,</span> <span class="n">countries</span><span class="p">,</span> <span class="n">periods</span><span class="p">)</span>
+
+    <span class="c1"># Read in data for predictors.</span>
+    <span class="n">predictor_table</span> <span class="o">=</span> <span class="n">read_in_data</span><span class="p">(</span><span class="s1">&#39;predictor_data_WDI.csv&#39;</span><span class="p">)</span>
+    <span class="n">predictors</span> <span class="o">=</span> <span class="n">create_table_of_predictors</span><span class="p">(</span><span class="n">country_table</span><span class="o">=</span><span class="n">countries</span><span class="p">,</span>
+                                            <span class="n">predictor_variables</span><span class="o">=</span><span class="n">predictor_table</span>
+                                            <span class="p">)</span>
+
+    <span class="c1"># Save data.</span>
+    <span class="n">countries</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">ppj</span><span class="p">(</span><span class="s1">&#39;OUT_DATA&#39;</span><span class="p">,</span> <span class="s1">&#39;countries.csv&#39;</span><span class="p">))</span>
+    <span class="n">periods</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">ppj</span><span class="p">(</span><span class="s1">&#39;OUT_DATA&#39;</span><span class="p">,</span> <span class="s1">&#39;periods.csv&#39;</span><span class="p">))</span>
+    <span class="n">gdppc_const_price</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">ppj</span><span class="p">(</span><span class="s1">&#39;OUT_DATA&#39;</span><span class="p">,</span> <span class="s1">&#39;gdppc_const_prices.csv&#39;</span><span class="p">))</span>
+    <span class="n">gdppc_current_price</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">ppj</span><span class="p">(</span><span class="s1">&#39;OUT_DATA&#39;</span><span class="p">,</span> <span class="s1">&#39;gdppc_current_prices.csv&#39;</span><span class="p">))</span>
+    <span class="n">ca_percent_gdp</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">ppj</span><span class="p">(</span><span class="s1">&#39;OUT_DATA&#39;</span><span class="p">,</span> <span class="s1">&#39;ca_percentage_gdp.csv&#39;</span><span class="p">))</span>
+    <span class="n">predictors</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">ppj</span><span class="p">(</span><span class="s1">&#39;OUT_DATA&#39;</span><span class="p">,</span> <span class="s1">&#39;predictor_data.csv&#39;</span><span class="p">))</span>
+</pre></div>
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2013-, Martin Dohmen.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>
