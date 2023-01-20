@@ -1,0 +1,25 @@
+#! python
+
+
+def build(ctx):
+
+
+    for model in 'gdppc_baseline', 'gdppc_with_covariates', 'ca_with_covariates', 'gdppc_all_year_averages', 'gdppc_time_placebo', 'gdppc_country_placebo':
+        ctx(
+            features='run_py_script',
+            source='synthetic_control.py',
+            deps=[
+                ctx.path_to(ctx, 'OUT_DATA', 'countries.csv'),
+                ctx.path_to(ctx, 'OUT_DATA', 'periods.csv'),
+                ctx.path_to(ctx, 'OUT_DATA', 'gdppc_const_prices.csv'),
+                ctx.path_to(ctx, 'OUT_DATA', 'gdppc_current_prices.csv'),
+                ctx.path_to(ctx, 'OUT_DATA', 'ca_percentage_gdp.csv'),
+                ctx.path_to(ctx, 'IN_MODEL_CODE', 'synth_control_functions.py'),
+                ctx.path_to(ctx, 'IN_MODEL_SPECS', 
+                            'synth_control_parameters_{}.json'.format(model)),
+                ctx.path_to(ctx, 'IN_MODEL_SPECS', 'predictors_{}.json'.format(model)),
+            ],
+            target=ctx.path_to(ctx, 'OUT_ANALYSIS', "sc_{}.pickle".format(model)),
+            append=model,
+            name='run_sc_method'      
+            )

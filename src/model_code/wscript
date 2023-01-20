@@ -1,0 +1,16 @@
+#! python
+import os
+
+def build(ctx):
+
+
+    # Run tests for synth_control_functions.
+    abspath_fcts = os.path.join(ctx.path.abspath(), 'synth_control_functions_test.py')
+
+    ctx(
+        features='run_py_script',
+        source='synth_control_functions_test.py',
+        deps='synth_control_functions.py',
+        append=abspath_fcts
+    )
+

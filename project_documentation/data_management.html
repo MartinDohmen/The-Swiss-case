@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Data management &mdash; The Swiss case: Reactions of the real economy to the discontinuation of the exchange rate floor in 2015. A synthetic control approach  documentation</title>
+    
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="The Swiss case: Reactions of the real economy to the discontinuation of the exchange rate floor in 2015. A synthetic control approach  documentation" href="index.html" />
+    <link rel="next" title="Main model estimations / simulations" href="analysis.html" />
+    <link rel="prev" title="Original data" href="original_data.html" /> 
+  </head>
+  <body role="document">
+      <div class="header" role="banner"><h1 class="heading"><a href="index.html">
+          <span>The Swiss case: Reactions of the real economy to the discontinuation of the exchange rate floor in 2015. A synthetic control approach  documentation</span></a></h1>
+        <h2 class="heading"><span>Data management</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="original_data.html">Original data</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="analysis.html">Main model estimations / simulations</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="data-management">
+<span id="id1"></span><h1>Data management<a class="headerlink" href="#data-management" title="Permalink to this headline">¶</a></h1>
+<p>This section does include all code doing the data management. This means it cleans the data, replaces missing values and brings it in the second normal form.
+Only the data needed for the later analysis is extracted.</p>
+<p>The second normal form is violated in one case, namely in the created table containing the predictor variables. In this table also the country names are included.
+This is done to make the data easier to read for humans in between, which was necessary in some stages of the project. As the dataset is only small, in my opinion the violation is not that much of a concern.</p>
+<p>The data management is done in the file <code class="file docutils literal"><span class="pre">clean_raw_data.py</span></code> in the folder <em>src.data_management</em>.</p>
+<p>It does and contains:</p>
+<span class="target" id="module-src.data_management.clean_raw_data"></span><p>Clean the raw data to use it for the analysis and bring it in the second normal
+form: Create a table for countries with IDs, one for time periods with IDs and
+one for every data series we do have and use later on. Furthermore, clean and
+replace missings for predictors and calculate averages for predictors over the 
+years 2012-2014 and safe them in a seperate datafile.</p>
+<p>All tested using Jupyter notebook and regression tests.</p>
+<dl class="function">
+<dt id="src.data_management.clean_raw_data.create_ca_percentage_gdp_table">
+<code class="descname">create_ca_percentage_gdp_table</code><span class="sig-paren">(</span><em>data</em>, <em>countries</em>, <em>periods</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/data_management/clean_raw_data.html#create_ca_percentage_gdp_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.data_management.clean_raw_data.create_ca_percentage_gdp_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create table of current accout in percentage of GDP for every country
+only including country ID and period ID.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.data_management.clean_raw_data.create_country_table">
+<code class="descname">create_country_table</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/data_management/clean_raw_data.html#create_country_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.data_management.clean_raw_data.create_country_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create table of countries sorted alphabetically with new IDs.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.data_management.clean_raw_data.create_gdppc_const_prices_table">
+<code class="descname">create_gdppc_const_prices_table</code><span class="sig-paren">(</span><em>data</em>, <em>countries</em>, <em>periods</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/data_management/clean_raw_data.html#create_gdppc_const_prices_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.data_management.clean_raw_data.create_gdppc_const_prices_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create table of GDPPC in constant prices (OECD reference year)
+with fixed PPP for every country only including
+country ID and period ID.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.data_management.clean_raw_data.create_gdppc_current_prices_table">
+<code class="descname">create_gdppc_current_prices_table</code><span class="sig-paren">(</span><em>data</em>, <em>countries</em>, <em>periods</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/data_management/clean_raw_data.html#create_gdppc_current_prices_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.data_management.clean_raw_data.create_gdppc_current_prices_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create table of GDPPC in current prices with current PPP for every country
+only including country ID and period ID.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.data_management.clean_raw_data.create_period_table">
+<code class="descname">create_period_table</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/data_management/clean_raw_data.html#create_period_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.data_management.clean_raw_data.create_period_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create table of Periods with IDs.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.data_management.clean_raw_data.create_table_of_predictors">
+<code class="descname">create_table_of_predictors</code><span class="sig-paren">(</span><em>country_table</em>, <em>predictor_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/data_management/clean_raw_data.html#create_table_of_predictors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.data_management.clean_raw_data.create_table_of_predictors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the table of predictor variables for every country only including
+country id and the different predictors.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.data_management.clean_raw_data.read_in_data">
+<code class="descname">read_in_data</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/data_management/clean_raw_data.html#read_in_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.data_management.clean_raw_data.read_in_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read in source data.</p>
+</dd></dl>
+
+</div>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="original_data.html">Original data</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="analysis.html">Main model estimations / simulations</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2013-, Martin Dohmen.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>src.analysis.schelling &mdash; The Swiss case: Reactions of the real economy to the discontinuation of the exchange rate floor in 2015. A synthetic control approach  documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="The Swiss case: Reactions of the real economy to the discontinuation of the exchange rate floor in 2015. A synthetic control approach  documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body role="document">
+      <div class="header" role="banner"><h1 class="heading"><a href="../../../index.html">
+          <span>The Swiss case: Reactions of the real economy to the discontinuation of the exchange rate floor in 2015. A synthetic control approach  documentation</span></a></h1>
+        <h2 class="heading"><span>src.analysis.schelling</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <h1>Source code for src.analysis.schelling</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Run a Schelling (1969, :cite:`Schelling69`) segregation</span>
+<span class="sd">model and store a list with locations by type at each cycle.</span>
+
+<span class="sd">The scripts expects that a model name is passed as an</span>
+<span class="sd">argument. The model name must correspond to a file called</span>
+<span class="sd">``[model_name].json`` in the &quot;IN_MODEL_SPECS&quot; directory.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">src.model_code.agent</span> <span class="kn">import</span> <span class="n">Agent</span>
+<span class="kn">from</span> <span class="nn">bld.project_paths</span> <span class="kn">import</span> <span class="n">project_paths_join</span> <span class="k">as</span> <span class="n">ppj</span>
+
+
+<div class="viewcode-block" id="setup_agents"><a class="viewcode-back" href="../../../analysis.html#src.analysis.schelling.setup_agents">[docs]</a><span class="k">def</span> <span class="nf">setup_agents</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Load the simulated initial locations and return a list</span>
+<span class="sd">    that holds all agents.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">initial_locations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">ppj</span><span class="p">(</span><span class="s2">&quot;OUT_DATA&quot;</span><span class="p">,</span> <span class="s2">&quot;initial_locations.csv&quot;</span><span class="p">),</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+    <span class="n">initial_locations</span> <span class="o">=</span> <span class="n">initial_locations</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">model</span><span class="p">[</span><span class="s2">&quot;n_types&quot;</span><span class="p">],</span> <span class="mi">30000</span><span class="p">)</span>
+
+    <span class="n">agents</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">typ</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;n_types&quot;</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;n_agents_by_type&quot;</span><span class="p">][</span><span class="n">typ</span><span class="p">]):</span>
+            <span class="n">agents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">Agent</span><span class="p">(</span>
+                    <span class="n">typ</span><span class="o">=</span><span class="n">typ</span><span class="p">,</span>
+                    <span class="n">initial_location</span><span class="o">=</span><span class="n">initial_locations</span><span class="p">[</span><span class="n">typ</span><span class="p">,</span> <span class="p">:,</span> <span class="n">i</span><span class="p">],</span>
+                    <span class="n">n_neighbours</span><span class="o">=</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;n_neighbours&quot;</span><span class="p">],</span>
+                    <span class="n">require_same_type</span><span class="o">=</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;require_same_type&quot;</span><span class="p">],</span>
+                    <span class="n">max_moves</span><span class="o">=</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;max_moves&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">agents</span>
+
+</div>
+<span class="k">def</span> <span class="nf">_get_locations_by_round_dict</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a dictionary with arrays to store locations for each type.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="n">typ</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;n_agents_by_type&quot;</span><span class="p">][</span><span class="n">typ</span><span class="p">],</span> <span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">for</span> <span class="n">typ</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;n_types&quot;</span><span class="p">])</span>
+    <span class="p">}</span>
+
+
+<span class="k">def</span> <span class="nf">_store_locations_by_round</span><span class="p">(</span><span class="n">loc</span><span class="p">,</span> <span class="n">agents</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Update the dictionary *loc* with the locations of each agent.</span>
+
+<span class="sd">    Doing so is a bit tedious because we do so by type.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">counter</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="n">agents</span><span class="p">:</span>
+        <span class="n">typ</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">type</span>
+        <span class="n">loc</span><span class="p">[</span><span class="n">typ</span><span class="p">][</span><span class="n">counter</span><span class="p">[</span><span class="n">typ</span><span class="p">],</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">location</span>
+        <span class="n">counter</span><span class="p">[</span><span class="n">typ</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+
+<div class="viewcode-block" id="run_analysis"><a class="viewcode-back" href="../../../analysis.html#src.analysis.schelling.run_analysis">[docs]</a><span class="k">def</span> <span class="nf">run_analysis</span><span class="p">(</span><span class="n">agents</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Given an initial set of *agents* and the *model*&#39;s parameters,</span>
+<span class="sd">    return a list of dictionaries with *type: N x 2* items.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">locations_by_round</span> <span class="o">=</span> <span class="p">[</span><span class="n">_get_locations_by_round_dict</span><span class="p">(</span><span class="n">model</span><span class="p">)]</span>
+    <span class="n">_store_locations_by_round</span><span class="p">(</span><span class="n">locations_by_round</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">agents</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">loop_counter</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;max_iterations&quot;</span><span class="p">]):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Entering loop {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">loop_counter</span><span class="p">))</span>
+        <span class="c1"># Make room for locations.</span>
+        <span class="n">locations_by_round</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_get_locations_by_round_dict</span><span class="p">(</span><span class="n">model</span><span class="p">))</span>
+        <span class="c1"># Update locations as necessary</span>
+        <span class="n">someone_moved</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="n">agents</span><span class="p">:</span>
+            <span class="n">old_location</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">location</span>
+            <span class="c1"># If necessary, move around until happy</span>
+            <span class="n">agent</span><span class="o">.</span><span class="n">move_until_happy</span><span class="p">(</span><span class="n">agents</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">location</span> <span class="o">==</span> <span class="n">old_location</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                <span class="n">someone_moved</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">_store_locations_by_round</span><span class="p">(</span><span class="n">locations_by_round</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">agents</span><span class="p">)</span>
+        <span class="c1"># We are done if everybody is happy.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">someone_moved</span><span class="p">:</span>
+            <span class="k">break</span>
+
+    <span class="k">if</span> <span class="n">someone_moved</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No convergence achieved after {} iterations&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;max_iterations&quot;</span><span class="p">]))</span>
+
+    <span class="k">return</span> <span class="n">locations_by_round</span>
+
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">model_name</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">ppj</span><span class="p">(</span><span class="s2">&quot;IN_MODEL_SPECS&quot;</span><span class="p">,</span> <span class="n">model_name</span> <span class="o">+</span> <span class="s2">&quot;.json&quot;</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+        <span class="n">filename</span><span class="o">=</span><span class="n">ppj</span><span class="p">(</span><span class="s2">&quot;OUT_ANALYSIS&quot;</span><span class="p">,</span> <span class="s2">&quot;log&quot;</span><span class="p">,</span> <span class="s2">&quot;schelling_{}.log&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_name</span><span class="p">)),</span>
+        <span class="n">filemode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span>
+        <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span>
+    <span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;rng_seed&quot;</span><span class="p">])</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;rng_seed&quot;</span><span class="p">])</span>
+
+    <span class="c1"># Load initial locations and setup agents</span>
+    <span class="n">agents</span> <span class="o">=</span> <span class="n">setup_agents</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+    <span class="c1"># Run the main analysis</span>
+    <span class="n">locations_by_round</span> <span class="o">=</span> <span class="n">run_analysis</span><span class="p">(</span><span class="n">agents</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+    <span class="c1"># Store list with locations after each round</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">ppj</span><span class="p">(</span><span class="s2">&quot;OUT_ANALYSIS&quot;</span><span class="p">,</span> <span class="s2">&quot;schelling_{}.pickle&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_name</span><span class="p">)),</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">out_file</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">locations_by_round</span><span class="p">,</span> <span class="n">out_file</span><span class="p">)</span>
+</pre></div>
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        <a class="uplink" href="../../../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2013-, Martin Dohmen.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>

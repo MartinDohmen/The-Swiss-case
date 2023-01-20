@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Visualisation and results formatting &mdash; The Swiss case: Reactions of the real economy to the discontinuation of the exchange rate floor in 2015. A synthetic control approach  documentation</title>
+    
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="The Swiss case: Reactions of the real economy to the discontinuation of the exchange rate floor in 2015. A synthetic control approach  documentation" href="index.html" />
+    <link rel="next" title="Research paper / presentations" href="paper.html" />
+    <link rel="prev" title="Main model estimations / simulations" href="analysis.html" /> 
+  </head>
+  <body role="document">
+      <div class="header" role="banner"><h1 class="heading"><a href="index.html">
+          <span>The Swiss case: Reactions of the real economy to the discontinuation of the exchange rate floor in 2015. A synthetic control approach  documentation</span></a></h1>
+        <h2 class="heading"><span>Visualisation and results formatting</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="analysis.html">Main model estimations / simulations</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="paper.html">Research paper / presentations</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="visualisation-and-results-formatting">
+<span id="final"></span><h1>Visualisation and results formatting<a class="headerlink" href="#visualisation-and-results-formatting" title="Permalink to this headline">¶</a></h1>
+<p>In this section the tables and figures are constructed from the results contained in the pickle file saved in the main analysis.
+The code is located in the directory <em>src.final</em>.</p>
+<div class="section" id="tables">
+<h2>Tables<a class="headerlink" href="#tables" title="Permalink to this headline">¶</a></h2>
+<p>For every specification the file <code class="file docutils literal"><span class="pre">sc_tables.py</span></code> construct three tables:</p>
+<ol class="arabic simple">
+<li>a table containing the weights for the countries in the donor pool constituting the synthetic control.</li>
+<li>a table containing the predictors for the treated country and the synthetic control.</li>
+<li>a table containing the outcomes for the treated country and the synthetic control as well as the constraint weighting matrix V and the status of the optimization. (This table is constructed just for inspection and to calculate some values for the paper, but is not included in the paper)</li>
+</ol>
+</div>
+<div class="section" id="figures">
+<h2>Figures<a class="headerlink" href="#figures" title="Permalink to this headline">¶</a></h2>
+<p>Furthermore, for every specification the file <code class="file docutils literal"><span class="pre">plot_sc_graph.py</span></code> construct a figure showing the development of the outcome variable for the treated unit and the synthetic control.
+To do so it defines and uses to functions.</p>
+<p>The file does and contains:</p>
+<span class="target" id="module-src.final.plot_sc_graph"></span><p>Plot the graph describing the solution of the synthetic control method.
+This means plot a line graph with time on x-achsis and the dependent variable
+on y-achsis and lines for the treated unit and the synthetic control.</p>
+<dl class="function">
+<dt id="src.final.plot_sc_graph.get_dates_for_x_axsis">
+<code class="descname">get_dates_for_x_axsis</code><span class="sig-paren">(</span><em>start_year</em>, <em>end_year</em>, <em>start_quarter=1</em>, <em>end_quarter=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/final/plot_sc_graph.html#get_dates_for_x_axsis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.final.plot_sc_graph.get_dates_for_x_axsis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare the dates on the x-axis of the plot.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.final.plot_sc_graph.plot_dep_var">
+<code class="descname">plot_dep_var</code><span class="sig-paren">(</span><em>z_one</em>, <em>z_sc</em>, <em>model_name</em>, <em>start_date</em>, <em>end_date</em>, <em>name</em>, <em>treatment_date</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/final/plot_sc_graph.html#plot_dep_var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.final.plot_sc_graph.plot_dep_var" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a line graph of the dependent variable for the treated unit and
+the synthetic control unit with time on x-axis.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="analysis.html">Main model estimations / simulations</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="paper.html">Research paper / presentations</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2013-, Martin Dohmen.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>

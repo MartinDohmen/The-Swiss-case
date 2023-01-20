@@ -1,0 +1,217 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Model code &mdash; The Swiss case: Reactions of the real economy to the discontinuation of the exchange rate floor in 2015. A synthetic control approach  documentation</title>
+    
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="The Swiss case: Reactions of the real economy to the discontinuation of the exchange rate floor in 2015. A synthetic control approach  documentation" href="index.html" />
+    <link rel="next" title="Model specifications" href="model_specs.html" />
+    <link rel="prev" title="Research paper / presentations" href="paper.html" /> 
+  </head>
+  <body role="document">
+      <div class="header" role="banner"><h1 class="heading"><a href="index.html">
+          <span>The Swiss case: Reactions of the real economy to the discontinuation of the exchange rate floor in 2015. A synthetic control approach  documentation</span></a></h1>
+        <h2 class="heading"><span>Model code</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="paper.html">Research paper / presentations</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="model_specs.html">Model specifications</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="model-code">
+<span id="id1"></span><h1>Model code<a class="headerlink" href="#model-code" title="Permalink to this headline">¶</a></h1>
+<p>This section contains a collection of functions implementing the algorithm by Becker and Klößner (2018). <a class="reference internal" href="references.html#becker2018" id="id2">[3]</a></p>
+<p>This is done in the file <code class="file docutils literal"><span class="pre">synth_control_functions.py</span></code> in the folder <em>src.model_code</em>:</p>
+<p>The file contains:</p>
+<span class="target" id="module-src.model_code.synth_control_functions"></span><p>Provide functions to calculate optimal weights for synthetic control unit.</p>
+<dl class="function">
+<dt id="src.model_code.synth_control_functions.calculate_inner_part_of_inequ_constr_for_linprog_16">
+<code class="descname">calculate_inner_part_of_inequ_constr_for_linprog_16</code><span class="sig-paren">(</span><em>x_tilde</em>, <em>w_outer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/synth_control_functions.html#calculate_inner_part_of_inequ_constr_for_linprog_16"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.model_code.synth_control_functions.calculate_inner_part_of_inequ_constr_for_linprog_16" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the inner part of the inequality constraints for the linear +
+program in (20) from Becker and Klößner (2018). This is, calculate
+(e_j - v) &#8216; B_k  w for k=1,...,K and stack them into a vector. Do that for
+all countries J, so j = 1,..., J and stack them into a matrix to get the
+matrix defining the inequality constraint of the linear program A_ub.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.model_code.synth_control_functions.create_matrix_v_from_v_k_tilde">
+<code class="descname">create_matrix_v_from_v_k_tilde</code><span class="sig-paren">(</span><em>v_k_tilde</em>, <em>k</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/synth_control_functions.html#create_matrix_v_from_v_k_tilde"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.model_code.synth_control_functions.create_matrix_v_from_v_k_tilde" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create matrix V from v_k_tilde about which to optimize, see (20)
+in Becker and Klößner (2018).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.model_code.synth_control_functions.determine_synthetic_control_weights">
+<code class="descname">determine_synthetic_control_weights</code><span class="sig-paren">(</span><em>x_tilde</em>, <em>z_tilde</em>, <em>lower_bound=1e-08</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/synth_control_functions.html#determine_synthetic_control_weights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.model_code.synth_control_functions.determine_synthetic_control_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Put everything together to determine the
+optimal country weights w and the optimal constraint weighting matrix v
+defining the synthetic control. As inputs use only numpy matrixes!
+The function works as described in the paper by Becker and Klößner (2018),
+especially it uses the algorithm shown in figure 2 of the paper. The
+difference to the paper so far is that it does not allow to pass a mapping
+V, but builds up V as a diagonal matrix of constraint weights. This means,
+so far it does not allow for time series as constraints with stable weights
+for the whole time series. Instead it always calculates for every single
+constraint the optimal weight to solve the outer minimization problem.
+This means do:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>determine sunny donors</li>
+</ol>
+<p>2. test of no sunny donors, if so solve outer minimization constraint
+to exact fit and stop.</p>
+<p>3. test of one sunny donor, if so just give him a positive weight
+and stop.</p>
+<p>4. try if unrestricted outer minimization feasible, if so choose
+weights solving unrestricted outer minimization and stop.</p>
+<ol class="arabic simple" start="5">
+<li>Perform the nested optimization task and choose weights solving it.</li>
+</ol>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.model_code.synth_control_functions.determine_unrestricted_outer_optimum">
+<code class="descname">determine_unrestricted_outer_optimum</code><span class="sig-paren">(</span><em>z_tilde</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/synth_control_functions.html#determine_unrestricted_outer_optimum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.model_code.synth_control_functions.determine_unrestricted_outer_optimum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Solve euqtion (13) in Becker and Klößner (2018) to get weights solving
+the unrestricted outer optimization problem. Return these weights.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.model_code.synth_control_functions.find_sunny_donors">
+<code class="descname">find_sunny_donors</code><span class="sig-paren">(</span><em>x_tilde</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/synth_control_functions.html#find_sunny_donors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.model_code.synth_control_functions.find_sunny_donors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find sunny donors from a numpy array of all donors according to (9)
+in Becker and Klößner (2018). Return a numpy array only including the data
+remaining for sunny donors and the number of sunny donors.
+Additionaly return the index in the matrix of columns for sunny and shady
+donors.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.model_code.synth_control_functions.function_to_solve_for_outer_optimum">
+<code class="descname">function_to_solve_for_outer_optimum</code><span class="sig-paren">(</span><em>w</em>, <em>z_tilde</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/synth_control_functions.html#function_to_solve_for_outer_optimum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.model_code.synth_control_functions.function_to_solve_for_outer_optimum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to solve for the outer optimum as used in (7) or (13) of
+Becker and Klößner (2018).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.model_code.synth_control_functions.inner_optimization">
+<code class="descname">inner_optimization</code><span class="sig-paren">(</span><em>x_tilde</em>, <em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/synth_control_functions.html#inner_optimization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.model_code.synth_control_functions.inner_optimization" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform the inner optimization of the synthetic control problem,
+corresponding to equation (8) in Becker and Klößner (2018).
+Return optimal weights for countries w.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.model_code.synth_control_functions.inner_optimization_function">
+<code class="descname">inner_optimization_function</code><span class="sig-paren">(</span><em>w</em>, <em>x_tilde</em>, <em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/synth_control_functions.html#inner_optimization_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.model_code.synth_control_functions.inner_optimization_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct the function to minimize by the inner optimization, 
+corresponding to the part after min in (8) in Becker and Klößner (2018)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.model_code.synth_control_functions.outer_optimization">
+<code class="descname">outer_optimization</code><span class="sig-paren">(</span><em>z_tilde</em>, <em>x_tilde</em>, <em>lower_bound=1e-08</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/synth_control_functions.html#outer_optimization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.model_code.synth_control_functions.outer_optimization" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform the outer optimization of equation (7) in Becker and klößner
+(2018). Use K optimizations of dimension K-1 as described in the paper
+in 3.5.. Return the optimal constrains weighting matrix v.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.model_code.synth_control_functions.outer_optimization_function">
+<code class="descname">outer_optimization_function</code><span class="sig-paren">(</span><em>v_k_tilde</em>, <em>z_tilde</em>, <em>x_tilde</em>, <em>k</em>, <em>K</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/synth_control_functions.html#outer_optimization_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.model_code.synth_control_functions.outer_optimization_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct the function to minimize in the K subproblems of the outer
+optimization. For that consruct V according to (20) and than construct
+function used in (7) in Becker and klößner (2018).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.model_code.synth_control_functions.solve_case_of_no_sunny_donors">
+<code class="descname">solve_case_of_no_sunny_donors</code><span class="sig-paren">(</span><em>x_tilde</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/synth_control_functions.html#solve_case_of_no_sunny_donors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.model_code.synth_control_functions.solve_case_of_no_sunny_donors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Solve the case when we have no sunny donors, so a perfect fit of the
+treated unit is possible. In this case I deviate from the paper by
+Becker and Klößner (2018). In their paper they solve the linear programm
+(10). This does not work with scipy.optimize as the minimizer does not
+support problems with more equality constraints than independent variables.
+As I did not find a good optimizer for python so far solving this problem,
+I will just choose a weights solving the inner minimization, so leading to
+a perfect fit for the synthetic control unit regarding the predictor
+variables. This might not be optimal concerning the outer optimization!
+The reason for this shortcut is that the case of perfect fit is very
+unprobable to begin with. If this case happens, the program will print a
+warning. In this case a good solution would be to choose more predictor
+variables. In an extrem case all variables/data points defining the outer
+optimization can be used as predictors. This would lead to the problem being
+unimportant as outer and inner optimization become the same!</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.model_code.synth_control_functions.ten_to_the_power_of_x">
+<code class="descname">ten_to_the_power_of_x</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/synth_control_functions.html#ten_to_the_power_of_x"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.model_code.synth_control_functions.ten_to_the_power_of_x" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate 10 to the power of x.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.model_code.synth_control_functions.try_if_unrestricted_outer_optimum_feasible">
+<code class="descname">try_if_unrestricted_outer_optimum_feasible</code><span class="sig-paren">(</span><em>x_tilde</em>, <em>z_tilde</em>, <em>lower_bound=1e-08</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/model_code/synth_control_functions.html#try_if_unrestricted_outer_optimum_feasible"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.model_code.synth_control_functions.try_if_unrestricted_outer_optimum_feasible" title="Permalink to this definition">¶</a></dt>
+<dd><p>Solve linear program in (16) in Becker and Klößner (2018).
+This means, determine if the outer optimum is feasible.
+If so, return a status telling that and the weights forming the outer
+optimum as well as the normalized constraint weighting matrix V belonging
+to the outer optimum. If not, return a status telling the outer optimum is
+infeasible and give numpy.nan as weights w and V.</p>
+</dd></dl>
+
+<p>All functions are tested using pytest within the file <code class="file docutils literal"><span class="pre">synth_control_functions_test.py</span></code>!</p>
+</div>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="paper.html">Research paper / presentations</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="model_specs.html">Model specifications</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2013-, Martin Dohmen.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>

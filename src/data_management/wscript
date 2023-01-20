@@ -1,0 +1,23 @@
+#! python
+
+
+def build(ctx):
+
+
+    ctx(
+        features='run_py_script',
+        source='clean_raw_data.py',
+        deps=[ctx.path_to(ctx, 'IN_DATA', 'GDPPC_OECD_1990_2017.csv'),
+              ctx.path_to(ctx, 'IN_DATA', 
+                          'Current_account_percentage_GDP_OECD_quarterly_1990_2017.csv'),
+              ctx.path_to(ctx, 'IN_DATA', 'predictor_data_WDI.csv'),                          
+              ],
+        target=[ctx.path_to(ctx, 'OUT_DATA', 'countries.csv'),
+                ctx.path_to(ctx, 'OUT_DATA', 'periods.csv'),
+                ctx.path_to(ctx, 'OUT_DATA', 'gdppc_const_prices.csv'),
+                ctx.path_to(ctx, 'OUT_DATA', 'gdppc_current_prices.csv'),
+                ctx.path_to(ctx, 'OUT_DATA', 'ca_percentage_gdp.csv'),
+                ctx.path_to(ctx, 'OUT_DATA', 'predictor_data.csv'),
+                ],
+        name='clean_raw_data'
+    )
