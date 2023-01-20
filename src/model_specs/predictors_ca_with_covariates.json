@@ -1,0 +1,8 @@
+{
+    "predictors": 
+	[{"type": "average", "name": "Current Account 2012-2014","data": "dep_variable", "periods": ["Q1-2012", "Q2-2012", "Q3-2012", "Q4-2012", "Q1-2013", "Q2-2013", "Q3-2013", "Q4-2013", "Q1-2014", "Q2-2014", "Q3-2014", "Q4-2014"]},
+        {"type": "trade_openness", "name": "Trade Openness","data": "predictor", "periods": ""},
+        {"type": "industry_share", "name": "Industry Share","data": "predictor", "periods": ""},
+        {"type": "inflation_rate", "name": "Inflation Rate","data": "predictor", "periods": ""},
+        {"type": "schooling", "name": "Schooling","data": "predictor", "periods": ""}]
+}

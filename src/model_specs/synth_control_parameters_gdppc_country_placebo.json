@@ -1,0 +1,9 @@
+{
+    "start_pre_treatment": "Q1-2007",
+    "start_treatment": "Q1-2015",
+    "end_treatment": "Q2-2017",
+    "treated_unit": "Australia",
+    "donor_units": ["Austria","Belgium","Canada", "Czech Republic","Denmark","Finland","Hungary", "Iceland","Luxembourg","Netherlands","New Zealand","Norway","Sweden","United Kingdom","United States"],
+    "filename_dep_variable": "gdppc_const_prices.csv",
+    "name_dep_variable": "GDP per Capita in const. prices"
+}

@@ -1,0 +1,8 @@
+{
+    "predictors": 
+	[{"type": "average","name": "GDPPC 2008", "data": "dep_variable", "periods": ["Q1-2008", "Q2-2008", "Q3-2008", "Q4-2008"]},
+        {"type": "average", "name": "GDPPC 2010","data": "dep_variable", "periods": ["Q1-2010", "Q2-2010", "Q3-2010", "Q4-2010"]},
+        {"type": "average", "name": "GDPPC 2012","data": "dep_variable", "periods": ["Q1-2012", "Q2-2012", "Q3-2012", "Q4-2012"]},
+        {"type": "average", "name": "GDPPC 2013","data": "dep_variable", "periods": ["Q1-2013", "Q2-2013", "Q3-2013", "Q4-2013"]},
+        {"type": "average", "name": "GDPPC 2014","data": "dep_variable", "periods": ["Q1-2014", "Q2-2014", "Q3-2014", "Q4-2014"]}]
+}
